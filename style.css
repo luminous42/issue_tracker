@@ -1,0 +1,155 @@
+body {
+  font-family: Inter, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  background-color: rgb(248, 249, 250);
+}
+
+.circle-button {
+  position: relative;
+  margin: 0;
+  padding: 4px 6px;
+  font-size: 14px;
+  color: #0b0e1f;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
+  text-decoration: none !important;
+  transition: all 0.3s;
+  border: 1px solid #e1e6ee;
+  border-radius: 20px;
+}
+
+.container {
+  padding: 15px;
+}
+
+.las {
+  font-size: 20px;
+}
+
+.add-issue {
+  background-color: #3ac47d;
+  padding: 8px 16px;
+  border-radius: 5px !important;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 100px;
+}
+
+table.dataTable {
+  border: 1px solid #dee2e6;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+a:hover {
+  color: #7db72f;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+i:hover {
+  color: #7db72f !important;
+}
+
+.align-center {
+  text-align: center !important;
+}
+.circle-button:hover {
+  border-color: #7db72f;
+}
+
+table.dataTable > thead > tr > th,
+table.dataTable > thead > tr > td {
+  border-bottom: 1px solid rgba(105, 105, 105, 0.3) !important;
+}
+
+th {
+  background-color: #f5f5f5 !important;
+  font-size: 12px;
+}
+td {
+  font-size: 14px;
+}
+.comment {
+  width: 28px;
+}
+
+tbody > tr:hover {
+  background-color: rgb(224, 243, 255) !important;
+}
+.table-striped > tbody > tr:nth-of-type(odd) {
+  --bs-table-accent-bg: #f5f5f5 !important;
+}
+
+.modal-dialog-right {
+  position: fixed;
+  right: 0;
+  top: 0;
+  margin: 0;
+  height: 100%;
+  max-width: 50%;
+  transform: translateX(100%) !important;
+  transition: transform 0.3s ease-out;
+  overflow-y: auto;
+}
+
+.modal.fade .modal-dialog {
+  transition: transform 0.3s ease-out !important;
+}
+
+.modal.show .modal-dialog {
+  transform: translateX(0) !important;
+}
+
+.modal-content {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+.modal-body {
+  overflow-y: auto; /* Enable scrolling for the modal body */
+}
+.modal-header {
+  background-color: rgb(248, 249, 250);
+  padding: 16px;
+}
+.nav-tabs {
+  border: none;
+  margin-bottom: 20px;
+}
+.nav-tabs .nav-link {
+  border: none;
+  padding-bottom: 1rem;
+}
+
+.nav-link {
+  color: #0b0e1f;
+  border-bottom: 2px solid rgba(0, 0, 0, 0);
+  margin-right: 1.25rem;
+}
+
+/* .nav-tabs .nav-item.show .nav-link,
+.nav-tabs .nav-link.active {
+  color: #3ac47d;
+  text-decoration-line: underline;
+} */
+
+#comment .nav-link.active {
+  border-bottom: 2px solid #7db72f;
+  color: #7db72f;
+  font-weight: 700;
+  padding-bottom: 0.5rem;
+}
+
+.nav-link:hover {
+  color: #0b0e1f;
+}

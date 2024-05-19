@@ -1,0 +1,1568 @@
+<%@ Page Title="Personwise Default Shift Setup" Language="C#" MasterPageFile="~/MainMaster.Master" AutoEventWireup="true" Inherits="PersonwiseDefaultShift" Codebehind="PersonwiseDefaultShift.aspx.cs" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
+    <link href="StyleSheet/jquery.multiselect.min.css?v1" rel="stylesheet" type="text/css" />
+    <style>
+        .personwise-default-shift-page .personwise_default_shift_tbl_wrapper #tabledisplay_info.dataTables_info {
+            top: -52px;
+            left: 99px;
+        }
+        .personwise-default-shift-page .personwise_default_shift_tbl_wrapper div#tabledisplay_filter {
+            margin-top: -48px;
+        }
+        #PersonalDetailInformation + #tbldisplaywrapper {
+            margin-top: 10px;
+        }
+
+        @media (max-height: 618px) {
+            .popped-up .nsdatepicker+.wrappercal {
+                top: auto !important;
+                bottom: 100%;
+            }
+        }
+    </style>
+</asp:Content>
+
+<asp:Content ID="Content2" ContentPlaceHolderID="main" runat="server">
+    <script src="js/jquery.multiselect.min.js" type="text/javascript"></script>
+        <script src="js/jquery.custom.js" type="text/javascript"></script>
+        <script src="js/boxover.js" type="text/javascript"></script>
+    <div class="page-wrapper posting-page personwise-default-shift-page">
+
+        <script language="javascript" type="text/javascript">
+            var globalMode;
+            var globalShiftid;
+
+            $(document).ready(function () {
+                $('#<%=ddlEmployeeName.ClientID%>').select2();
+                $('#<%=ddlShift.ClientID%>').select2();
+                //showBlankDiv();
+                $.BindADBSDate({
+                    DateInputAD: $("[ID$=txtEffectiveDateAD]").attr("id"),
+                    DateInputBS: $("[ID$=txtEffectiveDateBS]").attr("id"),
+                    RegularExpressionValidatorAD: $("[ID$=REVtxtEffectiveDateAD]").attr("id"),
+                    //RequiredFieldValidatorAD: "main_EmployeeTransfer_RFVtxtTransferRecommendedDate",
+                    //EnglishDateFormat: $DateFormat,
+                    //EnglishDateSeperator: $DateSeparator,
+                });
+                $.BindADBSDate({
+                    DateInputAD: $("[ID$=txtEffectiveToDateAD]").attr("id"),
+                    DateInputBS: $("[ID$=txtEffectiveToDateBS]").attr("id"),
+                    RegularExpressionValidatorAD: $("[ID$=REVtxtEffectiveToDateAD]").attr("id"),
+                    //RequiredFieldValidatorAD: "main_EmployeeTransfer_RFVtxtTransferRecommendedDate",
+                    //EnglishDateFormat: $DateFormat,
+                    //EnglishDateSeperator: $DateSeparator,
+                });
+            });
+            //SkipPages,RowLimit,SearchKey
+            //PageMethods.ExportContent(int SkipPages, int RowLimit, string SearchKey)
+            function lnkExport() {
+                //e.preventDefault();
+                $("#lnkExport").hide();
+                $("#imgloadingExportI").show();
+
+                var ContentList = "";
+                ContentList = getExportContent();
+                var jHtmlObject = jQuery(ContentList);
+                var editor = jQuery("<p>").append(jHtmlObject);
+                editor.find(".help-text").remove();
+                var newHtml = editor.html();
+
+                PageMethods.ExcelExportContent(newHtml, function (response) {
+                    if (response == "Done") {
+                        $("#lnkExport").show();
+                        $("#imgloadingExportI").hide();
+                        funExportToExcel("Personwise Default Shift.xls", "application/ms-excel", " ");
+                    }
+                }, function (error) {
+                    alert(error);
+                    $("#lnkExport").show();
+                    $("#imgloadingExportI").hide();
+                });
+
+            }
+            function getExportContent() {
+                var ContentList = '';
+                ContentList += "<style>.text-right{text-align:right;} th {text-align: left;word-wrap: normal} .text-center, .print_js th:first-child, .print_js td:first-child {text-align: center;} .main-wrapper table { border-collapse: collapse; } td, th {padding:5px; text-align:left;font-size: 12px; font-family:'Tahoma', sans-serif;} .main-wrapper td,.main-wrapper th {font-size: 12px; font-family:'Tahoma', sans-serif; }</style> ";
+                ContentList += "<div class='main-wrapper' style='width: 100%; border-collapse: collapse; font-size: 13px;  font-family: Tahoma, sans-serif; '>";
+                ContentList += "<table id='tblhead' cellpadding='5' cellspacing='2' style='font-family:Tahoma; font-size:13px; border-collapse: collapse; vertical-align: middle; margin-top: 15px;'>";
+                
+                ContentList += "</table>";
+                ContentList += "<table><tr><td></td></tr></table>";
+                ContentList += "<table class='print_js' cellpadding='5' cellspacing='2' border='1' style='width: 100%; font-family:Tahoma; font-size:13px; border-collapse: collapse; vertical-align: middle;'>";
+                //ddlFiscalYear, leavetype, mode, ddlBranch, ddlDepartment, ddlEmployee, endIndex
+                // if ($RptType == "0")
+                $table = $("table#main_dgvOvertime");
+                ContentList += "<thead>";
+                ContentList += "<tr>";
+                ContentList += "<th>";
+                ContentList += "EmpId";
+                ContentList += "</th>";
+
+                //Person
+                ContentList += "<th>";
+                ContentList += "Person";
+                ContentList += "</th>";
+                //SunDay
+                ContentList += "<th>";
+                ContentList += "Sunday";
+                ContentList += "</th>";
+                //MonDay
+                ContentList += "<th>";
+                ContentList += "Monday";
+                ContentList += "</th>";
+                //TuesDay
+                ContentList += "<th>";
+                ContentList += "Tuesday";
+                ContentList += "</th>";
+                //WedDay
+                ContentList += "<th>";
+                ContentList += "Wednesday";
+                ContentList += "</th>";
+                //ThursDay
+                ContentList += "<th>";
+                ContentList += "Thursday";
+                ContentList += "</th>";
+                //FriDay
+                ContentList += "<th>";
+                ContentList += "Friday";
+                ContentList += "</th>";
+                //SaturDay
+                ContentList += "<th>";
+                ContentList += "Saturday";
+                ContentList += "</th>";
+                //Set Date
+                ContentList += "<th>";
+                ContentList += "Effective Date(AD)";
+                ContentList += "</th>";
+             <% if (Convert.ToBoolean(Session["ShowBSDate"]) == true)
+            { %>
+
+                //Set Date 
+                ContentList += "<th>";
+                ContentList += "Effective Date(BS)";
+                ContentList += "</th>";
+            <%}%>
+                ContentList += "</tr>";
+
+                ContentList += "</thead>";
+                ContentList += "<tbody>";
+
+
+                var SkipPages = 0;
+                var RowLimit = 30;
+                var SearchKey = '';
+                $.ajax({
+                    type: 'POST',
+                    async: false,
+                    url: "Personwisedefaultshift.aspx/ExportContent",
+                    data: JSON.stringify({ SkipPages, RowLimit, SearchKey }),
+                    dataType: 'json',
+                    contentType: "application/json;charset=utf-8",
+                    success: function (msg) {
+                        var obj = msg.d;
+                        if (obj.length > 0) {
+                            $.each(obj, function (index, item) {
+                                ContentList += "<tr>";
+                                //Id,SetDateAD,SetDateBS,Person,Days
+                                ContentList += "<td>";
+                                ContentList += "<span>";
+                                ContentList += obj[index].EmpId;
+                                ContentList += "</span>";
+                                ContentList += "</td>";
+
+                                //Person
+                                ContentList += "<td>";
+                                ContentList += "<span>";
+                                ContentList += obj[index].Person;
+                                ContentList += "</span>";
+                                ContentList += "</td>";
+                                ContentList += "<td class='text-right'>";
+                                ContentList += "<span>";
+                                ContentList += obj[index].Sunday;
+                                ContentList += "</span>";
+                                ContentList += "</td>";
+                                ContentList += "<td class='text-right'>";
+                                ContentList += "<span>";
+                                ContentList += obj[index].Monday;
+                                ContentList += "</span>";
+                                ContentList += "</td>";
+                                //Days
+                                ContentList += "<td class='text-right'>";
+                                ContentList += "<span>";
+                                ContentList += obj[index].Tuesday;
+                                ContentList += "</span>";
+                                ContentList += "</td>";
+                                //Days
+                                ContentList += "<td class='text-right'>";
+                                ContentList += "<span>";
+                                ContentList += obj[index].Wednesday;
+                                ContentList += "</span>";
+                                ContentList += "</td>";
+                                //Days
+                                ContentList += "<td class='text-right'>";
+                                ContentList += "<span>";
+                                ContentList += obj[index].Thursday;
+                                ContentList += "</span>";
+                                ContentList += "</td>";
+                                //Days
+                                ContentList += "<td class='text-right'>";
+                                ContentList += "<span>";
+                                ContentList += obj[index].Friday;
+                                ContentList += "</span>";
+                                ContentList += "</td>";
+                                //Days
+                                ContentList += "<td class='text-right'>";
+                                ContentList += "<span>";
+                                ContentList += obj[index].Saturday;
+                                ContentList += "</span>";
+                                ContentList += "</td>";
+                                //SetDateAD
+                                ContentList += "<td class='text-right'>";
+                                ContentList += "<span>";
+                                ContentList += obj[index].EffectiveDateAD;
+                                ContentList += "</span>";
+                                ContentList += "</td>";
+                            <% if (Convert.ToBoolean(Session["ShowBSDate"]) == true)
+            { %>
+                                //SetDateBS
+                                ContentList += "<td class='text-right'>";
+                                ContentList += "<span>";
+                                ContentList += obj[index].EffectiveDateBS;
+                                ContentList += "</span>";
+                                ContentList += "</td>";
+                            <%}%>
+                            });
+                        }
+                    }
+                });
+                ContentList += "</tbody>";
+                ContentList += "</table>";
+                ContentList += "<table cellpadding='5' cellspacing='2' style='width: 500px; font-family:Tahoma; font-size:13px; border-collapse: collapse; vertical-align: middle; margin-top: 10px;'>";
+                //ContentList += "<tbody>";
+                //ContentList += $(".pnlNotification table").html();
+                //ContentList += "</tbody>";
+                ContentList += "</table>";
+                ContentList += "</div>";
+                return ContentList;
+            }
+
+
+            /*Start of for delay search in bServerSide*/
+            jQuery.fn.dataTableExt.oApi.fnSetFilteringDelay = function (oSettings, iDelay) {
+                var _that = this;
+
+                if (iDelay === undefined) {
+                    iDelay = 250;
+                }
+
+                this.each(function (i) {
+                    $.fn.dataTableExt.iApiIndex = i;
+
+                    var $this = this, oTimerId = null, sPreviousSearch = null, anControl = $('input', _that.fnSettings().aanFeatures.f);
+
+                    anControl.unbind('keyup').bind('keyup', function () {
+                        var $$this = $this;
+
+                        if (sPreviousSearch === null || sPreviousSearch != anControl.val()) {
+                            window.clearTimeout(oTimerId);
+                            sPreviousSearch = anControl.val();
+                            oTimerId = window.setTimeout(function () {
+                                $.fn.dataTableExt.iApiIndex = i;
+                                _that.fnFilter(anControl.val());
+                            }, iDelay);
+                        }
+                    });
+
+                    return this;
+                });
+
+                return this;
+            };
+            /*End of for delay search in bServerSide*/
+
+            $SundayShiftLabel = "<%=Resources.Language.WeekDayName %>".toString().split(";")[0];
+            $MondayShiftLabel = "<%=Resources.Language.WeekDayName %>".toString().split(";")[1];
+            $TuesdayShiftLabel = "<%=Resources.Language.WeekDayName %>".toString().split(";")[2];
+            $WednesdayShiftLabel = "<%=Resources.Language.WeekDayName %>".toString().split(";")[3];
+            $ThursdayShiftLabel = "<%=Resources.Language.WeekDayName %>".toString().split(";")[4];
+            $FridayShiftLabel = "<%=Resources.Language.WeekDayName %>".toString().split(";")[5];
+            $SaturdayShiftLabel = "<%=Resources.Language.WeekDayName %>".toString().split(";")[6];
+            $NewLable = "<%=Resources.Language.New %>";
+            $EditLable = "<%=Resources.Language.Edit %>";
+
+            var table;
+            var editedtr;
+            var FilterText = "<%=Resources.Language.FilterText %>";
+
+            function filterdata(ctrl, column) {
+                $val = $("#" + ctrl).val();
+                $value = $("#" + ctrl + " option:selected").text();
+
+                if ($value.indexOf("(") > 0 || $value.indexOf(")") > 0) {
+                    table.fnFilter($val == 0 ? "" : $value, column);
+                } else {
+                    table.fnFilter($val == 0 ? "" : "^" + $value + "$", column, true);
+                }
+            }
+
+            function BindGrid() {
+                table = $('#tabledisplay').dataTable({
+                    "sPaginationType": "full_numbers",
+                    "oLanguage": {
+                        "oPaginate": {
+                            "sNext": '>',
+                            "sLast": '>>',
+                            "sFirst": '<<',
+                            "sPrevious": '<'
+                        },
+                        "sInfo": "<%=Resources.Language.RecordInfo%>"
+                    },
+                    "bServerSide": true,
+                    "bProcessing": true,
+                    "sAjaxSource": 'Handlers/PersonwiseDefaultShift.ashx',
+                    "bAutoWidth": false,
+                    "aoColumns": [
+                        { sWidth: 'auto', "bSortable": false },
+                        { sWidth: 'auto', "bSortable": false },
+                        { sWidth: 'auto', "bSortable": false },
+                        { sWidth: 'auto', "bSortable": false },
+                        { sWidth: 'auto', "bSortable": false },
+                        { sWidth: 'auto', "bSortable": false, "bVisible": false },
+                        { sWidth: 'auto', "bSortable": false, "bVisible": false },
+                        { sWidth: 'auto', "bSortable": false, "bVisible": false },
+                        { sWidth: 'auto', "bSortable": false, "bVisible": false },
+                        { sWidth: 'auto', "bSortable": false, "bVisible": false },
+                        { sWidth: 'auto', "bSortable": false, "bVisible": false },
+                        { sWidth: 'auto', "bSortable": false, "bVisible": false },
+                        { sWidth: 'auto', "bSortable": false },
+                        { sWidth: 'auto', "bSortable": false },
+                        { sWidth: 'auto', "bSortable": false },
+                        { sWidth: 'auto', "bSortable": false }
+                    ],
+                    "fnDrawCallback": function () {
+                        if ($('#tabledisplay_paginate span span.paginate_button').size()) {
+                            $('#tabledisplay_paginate')[0].style.display = "block";
+                            $('#tabledisplay_length')[0].style.display = "block";
+                        } else {
+                            $('#tabledisplay_paginate')[0].style.display = "none";
+                            if ($("#tabledisplay tbody tr").length <= 10) {
+                                $('#tabledisplay_length')[0].style.display = "none";
+                            }
+                            else {
+                                $('#tabledisplay_length')[0].style.display = "block";
+                            }
+                        }
+                        /*
+                        if (table.fnGetData().length == 0) {
+                            showBlankDiv();
+                        } else {
+                            //alert("table has data");
+                        }
+                        */
+                    }
+
+                }).fnSetFilteringDelay(750);
+            }
+
+            $(function () {
+                $("#<%=txtEffectiveDateAD.ClientID %>").attr("placeholder", '<%=Session["DateFormat"].ToString().ToUpper() %>');
+                $("#<%=txtEffectiveToDateAD.ClientID %>").attr("placeholder", '<%=Session["DateFormat"].ToString().ToUpper() %>');
+
+                var EmployeeIDList = "";
+                BindGrid();
+                //showBlankDiv();
+
+                $("#tabledisplay .edit").live("click", function () {
+                    $("#<%= lblEventHeader.ClientID%>").text($EditLable);
+                    editedtr = $(this).closest("tr").get(0);
+                    $("#<%=btnAdd.ClientID %>").hide();
+                    $("#<%=btnSave.ClientID %>").show();
+                    $("#pnlPerswiseDefaultShift").show();
+                    AssignShiftLableName();
+                    EditClick($(this), 'edit');
+                    $("ul.tabs li").show();
+                    return false;
+                });
+
+                $("#tabledisplay .delete").live("click", function () {
+                    var recordid = $(this).data("id");
+                    deletedtr = $(this).closest("tr").get(0);
+
+                    csscody.confirm("<%= Resources.Language.ConfirmationMsgForDelete%>", {
+                        onComplete: function () {
+                            if (arguments[0] == true)
+                                PageMethods.DeleteEmployeewiseDefaultShift(recordid, function (response) {
+
+                                    table.fnDeleteRow(table.fnGetPosition(deletedtr));
+                                    ShowNotification(response);
+                                    //showBlankDiv();
+                                });
+                        }
+                    });
+
+                    return false;
+                });
+
+                $('#<%=ddlEmployeeName.ClientID%>').change(function () {
+                    CheckForValidation($("#<% =ddlEmployeeName.ClientID%>").val(), 'spnEmployeeName',"<% =ddlEmployeeName.ClientID%>");
+                });
+
+                PageMethods.AddRows(function (response) {
+                    var newarray = [];
+                    response = eval("(" + response + ")");
+
+                    for (var i = 0; i < 7; i++)
+                        newarray.push({ rowindex: i + 1, ShiftList: response[0].ShiftList });
+                    //console.log(newarray);
+                    $("#AddShiftTemplate").tmpl(newarray).appendTo("#DefaultShiftContainer");
+                    bindmultipleselect();
+                });
+            });
+
+            function DisableInactiveOptions() {
+                $(".mulitplecombo option").each(function (i) {
+                    if ($(this).data('disabled') == true) {
+                        //alert($(this).val());
+                        //$(".ui-multiselect-checkboxes li input[value=" + $(this).val() + "]").attr("disabled", "disabled");
+                        var element = $(".ui-multiselect-checkboxes li input[value=" + $(this).val() + "]");
+                        element.prop("checked", false);
+                        element.attr("disabled", "disabled");
+                        element.closest("li").hide();
+
+                    }
+                });
+            }
+            $(document).ready(function () {
+                // Attach change event listener to ddlShift DropDownList
+                $("#<%=ddlShift.ClientID%>").change(function () {
+                    $("#ddlShift1").multiselect("uncheckAll");
+                    $("#ddlShift2").multiselect("uncheckAll");
+                    $("#ddlShift3").multiselect("uncheckAll");
+                    $("#ddlShift4").multiselect("uncheckAll");
+                    $("#ddlShift5").multiselect("uncheckAll");
+                    $("#ddlShift6").multiselect("uncheckAll");
+                    $("#ddlShift7").multiselect("uncheckAll");
+                    // Call ShiftForPersonwiseDefaultShift function passing the DropDownList value and type
+                    ShiftForPersonwiseDefaultShift($(this).val(), 'change');
+
+                    if ((globalMode == 'add' || globalMode == false) && globalShiftid == null) {
+                        // Get default WorkHour Working Day OT Based on Shift Changes
+                        PageMethods.GetWorkHour($("#<% =ddlShift.ClientID%>").val(), function (response) {
+                            var data = JSON.parse(response);
+                            if (data.shift.length > 0) {
+                                if (data.shift[0].MaxmiumOTAllowed == null || data.shift[0].MaxmiumOTAllowed == '') {
+                                    $("#<%=txtMaxOTOnWorkingDay.ClientID%>").val("0.00");
+                                } else {
+                                    $("#<%=txtMaxOTOnWorkingDay.ClientID%>").val(data.shift[0].MaxmiumOTAllowed);
+                                }
+                            }
+                        })
+                    }
+                });
+            });
+            function ShiftForPersonwiseDefaultShift(obj, type) {
+                PageMethods.ShiftForPersonwiseDefaultShift($("#<%=ddlShift.ClientID%>").val(), function (response) {
+                    if (response != "") {
+                        var info = eval("(" + response + ")");
+                        $sundayshiftarray = info.SUNDAYSHIFT.split(",");
+                        $mondayShiftArray = info.MONDAYSHIFT.split(",");
+                        $TuesdayShiftArray = info.TUESDAYSHIFT.split(",");
+                        $WednesdayShiftArray = info.WEDNESDAYSHIFT.split(",");
+                        $ThrusdayShiftArray = info.THRUSDAYSHIFT.split(",");
+                        $FridayShiftArray = info.FRIDAYSHIFT.split(",");
+                        $saturdayShiftArray = info.SATURDAYSHIFT.split(",");
+
+                        for (var i = 0; i < $sundayshiftarray.length; i++) {
+                            $("#ddlShift1").multiselect("widget").find(":checkbox[value='" + $sundayshiftarray[i] + "']").click();
+                        }
+
+                        for (var i = 0; i < $mondayShiftArray.length; i++) {
+                            $("#ddlShift2").multiselect("widget").find(":checkbox[value='" + $mondayShiftArray[i] + "']").click();
+
+                        }
+
+                        for (var i = 0; i < $TuesdayShiftArray.length; i++) {
+                            $("#ddlShift3").multiselect("widget").find(":checkbox[value='" + $TuesdayShiftArray[i] + "']").click();
+                        }
+
+                        for (var i = 0; i < $WednesdayShiftArray.length; i++) {
+                            $("#ddlShift4").multiselect("widget").find(":checkbox[value='" + $WednesdayShiftArray[i] + "']").click();
+                        }
+
+                        for (var i = 0; i < $ThrusdayShiftArray.length; i++) {
+                            $("#ddlShift5").multiselect("widget").find(":checkbox[value='" + $ThrusdayShiftArray[i] + "']").click();
+                        }
+
+                        for (var i = 0; i < $FridayShiftArray.length; i++) {
+                            $("#ddlShift6").multiselect("widget").find(":checkbox[value='" + $FridayShiftArray[i] + "']").click();
+                        }
+
+                        for (var i = 0; i < $saturdayShiftArray.length; i++) {
+                            $("#ddlShift7").multiselect("widget").find(":checkbox[value='" + $saturdayShiftArray[i] + "']").click();
+                        }
+                    }
+                });
+            }
+
+            function EditClick(obj, type) {
+                globalMode = 'edit';
+                $("#remunerationLabel").text("");
+
+                CheckSession();
+                showloading();
+                $.popup({ content: "dialog-form-EmployeewiseDefaultShift", top: "150", status: true });
+                // load shift tab as default
+                tabForShift()
+                PageMethods.GetEmployeewiseDefaultShift($(obj).data("id"), function (response) {
+
+                    if (response != "") {
+                        var info = eval("(" + response + ")");
+
+                        $(".mulitplecombo").multiselect({
+                            noneSelectedText: "<%= GetGlobalResourceObject("Language","Select")%>",
+                            selectedText: '# <%= GetGlobalResourceObject("Language","Selected")%>',
+                            selectedList: 1
+                        }).multiselect("uncheckAll");
+
+                        $("#<%= hdnRecordId.ClientID%>").val(info.RecordID);
+                        $sundayshiftarray = info.SundayShift.split(",");
+                        $mondayShiftArray = info.MondayShift.split(",");
+                        $TuesdayShiftArray = info.TuesdayShift.split(",");
+                        $WednesdayShiftArray = info.WednesdayShift.split(",");
+                        $ThrusdayShiftArray = info.ThrusdayShift.split(",");
+                        $FridayShiftArray = info.FridayShift.split(",");
+                        $saturdayShiftArray = info.SaturdayShift.split(",");
+
+                        for (var i = 0; i < $sundayshiftarray.length; i++) {
+                            $("#ddlShift1").multiselect("widget").find(":checkbox[value='" + $sundayshiftarray[i] + "']").click();
+                        }
+
+                        for (var i = 0; i < $mondayShiftArray.length; i++) {
+                            $("#ddlShift2").multiselect("widget").find(":checkbox[value='" + $mondayShiftArray[i] + "']").click();
+
+                        }
+
+                        for (var i = 0; i < $TuesdayShiftArray.length; i++) {
+                            $("#ddlShift3").multiselect("widget").find(":checkbox[value='" + $TuesdayShiftArray[i] + "']").click();
+                        }
+
+                        for (var i = 0; i < $WednesdayShiftArray.length; i++) {
+                            $("#ddlShift4").multiselect("widget").find(":checkbox[value='" + $WednesdayShiftArray[i] + "']").click();
+                        }
+
+                        for (var i = 0; i < $ThrusdayShiftArray.length; i++) {
+                            $("#ddlShift5").multiselect("widget").find(":checkbox[value='" + $ThrusdayShiftArray[i] + "']").click();
+                        }
+
+                        for (var i = 0; i < $FridayShiftArray.length; i++) {
+                            $("#ddlShift6").multiselect("widget").find(":checkbox[value='" + $FridayShiftArray[i] + "']").click();
+                        }
+
+                        for (var i = 0; i < $saturdayShiftArray.length; i++) {
+                            $("#ddlShift7").multiselect("widget").find(":checkbox[value='" + $saturdayShiftArray[i] + "']").click();
+                        }
+
+                        globalShiftid = info.Shift;
+
+                        $("#<%=ddlEmployeeName.ClientID %>").val(info.Emp_ID);
+                        $("#<%=ddlEmployeeName.ClientID %>").select2().trigger('change');
+                        $("#<%=ddlEmployeeName.ClientID %>").attr('disabled', 'disabled');
+                        $("#<%=txtEmpId.ClientID %>").attr('disabled', 'disabled');
+
+                        $("#<%=txtEffectiveDateAD.ClientID %>").val(info.EffectiveDateAD);
+                        $("#<% =txtEffectiveDateBS.ClientID%>").val(info.EffectiveDateBS);
+
+                        $("#<%= txtEmpId.ClientID%>").val(info.Emp_ID);
+                        $("#<%=txtEffectiveToDateAD.ClientID %>").val(info.EffectiveToDateAD);
+                        $("#<%=txtEffectiveToDateBS.ClientID %>").val(info.EffectiveToDateBS);
+                        $("#<%=txtMaxOTOnWorkingDay.ClientID %>").val(info.MaxOTOnWorkingDay);
+                        $("#<%=txtMaxOTOnOffDay.ClientID %>").val(info.MaxOTOnOffDay);
+                        $("#<%=txtMaxOTOnPublicHoliday.ClientID %>").val(info.MaxOTOnPublicHoliday);
+                        $("#<%=ddlShift.ClientID %>").val(info.Shift);
+                        <%--$("#<%=ddlShift.ClientID %>").select2().trigger('change');--%>
+
+                        hideloading();
+                    }
+                });
+            }
+
+            function AssignShiftLableName() {
+                $("#lblDayName1").text($SundayShiftLabel);
+                $("#lblDayName2").text($MondayShiftLabel);
+                $("#lblDayName3").text($TuesdayShiftLabel);
+                $("#lblDayName4").text($WednesdayShiftLabel);
+                $("#lblDayName5").text($ThursdayShiftLabel);
+                $("#lblDayName6").text($FridayShiftLabel);
+                $("#lblDayName7").text($SaturdayShiftLabel);
+            }
+
+            function AddClick() {
+                globalMode = 'add';
+                globalShiftid = null;
+                $("#remunerationLabel").text("");
+                // set shift tab as default
+                tabForShift()
+
+                AssignShiftLableName();
+                $("#<%= lblEventHeader.ClientID%>").text($NewLable);
+            <%-- $("#<%=btnAdd.ClientID %>").hide(); --%>
+                $("#<%=btnSave.ClientID %>").show();
+                $("#pnlPerswiseDefaultShift").show();
+                $("#<%= hdnRecordId.ClientID%>").val("0");
+                $("#<%=ddlEmployeeName.ClientID %>").removeAttr("disabled");
+                $("#<%=txtEmpId.ClientID %>").removeAttr("disabled");
+
+                clearfields();
+                $.popup({ content: "dialog-form-EmployeewiseDefaultShift", top: "150", status: true });
+            }
+
+            function clearfields() {
+                $("#<%= lblEventHeader.ClientID%>").text($NewLable);
+                $("#<% =ddlEmployeeName.ClientID%>").get(0).selectedIndex = 0;
+                $("#<% =ddlEmployeeName.ClientID%>").select2();
+                $("#<%= txtEmpId.ClientID%>").val("");
+                $("#<%= txtEffectiveDateAD.ClientID%>").val("");
+                $("#<%= txtEffectiveDateBS.ClientID%>").val("");
+                $("#<%=ddlShift.ClientID%>").get(0).selectedIndex = 0;
+                $("#<%=ddlShift.ClientID%>").select2();
+                $("#<%= txtEffectiveToDateAD.ClientID%>").val("");
+                $("#<%= txtEffectiveToDateBS.ClientID%>").val("");
+                $("#<%= txtMaxOTOnWorkingDay.ClientID%>").val("");
+                $("#<%= txtMaxOTOnOffDay.ClientID%>").val("");
+                $("#<%= txtMaxOTOnPublicHoliday.ClientID%>").val("");
+
+
+                $(".mulitplecombo").multiselect({
+                    noneSelectedText: "<%= GetGlobalResourceObject("Language","Select")%>",
+                    selectedText: '# <%= GetGlobalResourceObject("Language","Selected")%>',
+                    selectedList: 1,
+                }).multiselect("uncheckAll");
+
+                $("#<%= hdnRecordId.ClientID%>").val("0");
+                $("#spnEmployeeName").hide();
+                $("#spnShift1").hide();
+                $("#spnShift2").hide();
+                $("#spnShift3").hide();
+                $("#spnShift4").hide();
+                $("#spnShift5").hide();
+                $("#spnShift6").hide();
+                $("#spnShift7").hide();
+                $("#spnEffectiveDate").hide();
+                removeValidation("<% =ddlEmployeeName.ClientID%>");
+                removeValidation("<% =txtEmpId.ClientID%>");
+                removeValidation("ddlShift1");
+                removeValidation("ddlShift2");
+                removeValidation("ddlShift3");
+                removeValidation("ddlShift4");
+                removeValidation("ddlShift5");
+                removeValidation("ddlShift6");
+                removeValidation("ddlShift7");
+                removeValidation("<% =txtEffectiveDateAD.ClientID%>");
+                removeValidation("<% =txtEffectiveDateBS.ClientID%>");
+            }
+            function removeValidation(ctrlid) {
+                var ctrl = $("#" + ctrlid);
+                if (ctrl.get(0).nodeName == "SELECT") {
+                    if (ctrl.hasClass("select2-hidden-accessible")) {
+                        id = ctrl.attr("id");
+                        if ($("#select2-" + id + "-container").parent().hasClass('input-required-class')) {
+                            $("#select2-" + id + "-container").parent().removeClass('input-required-class')
+                            $("#" + id).on("change", function () {
+                                //validateForm(classname);
+                            });
+                        }
+                    }
+                    else if (ctrl.hasClass("mulitplecombo")) {
+                        if (ctrl.next().hasClass("input-required-class")) {
+                            ctrl.next().removeClass("input-required-class");
+                        }
+                    }
+                    else {
+                        if (ctrl.hasClass("input-required-class")) {
+                            ctrl.removeClass("input-required-class");
+                        }
+                    }
+                } else {
+                    if (ctrl.hasClass("input-required-class")) {
+                        ctrl.removeClass("input-required-class");
+                    }
+                }
+            }
+            function closePopup() {
+                $.popup({ content: "dialog-form-EmployeewiseDefaultShift", status: false });
+                $("#<%=btnAdd.ClientID %>").show();
+
+            }
+
+            function onCancelClick() {
+                $("#tbldisplaywrapper").show();
+                $("#<%=btnAdd.ClientID %>").show();
+                $("#pnlPerswiseDefaultShift").hide();
+                return false;
+            }
+
+            var saveFlag = false;
+
+            function bindmultipleselect() {
+                $(".mulitplecombo").multiselect({
+                    header: 1,
+                    noneSelectedText: "<%= GetGlobalResourceObject("Language","Select")%>",
+                    checkAllText: "",
+                    uncheckAllText: "",
+                    selectedText: '# <%= GetGlobalResourceObject("Language","Selected")%>',
+                    selectedList: 1,
+                    open: function () {
+                        saveFlag = true;
+                        DisableInactiveOptions();
+                    },
+                    close: function () {
+                        saveFlag = false;
+                    },
+                    click: function (event, ui) {
+                        if (saveFlag == true) {
+                            if (ui.value > 0) {
+                                if (ui.checked == true) {
+                                    var st = parseInt(ui.text.split("-")[0]);
+                                    var lt = parseInt(ui.text.split("-")[1]);
+
+                                    if (st > 12 && st > lt) {
+                                        lt += 24;
+                                    }
+
+                                    var shiftidsarray = $("input[id*='ui-multiselect-" + $(this).attr("id") + "'][aria-selected='true'][value!='" + ui.value + "']");
+
+                                    if (shiftidsarray.toString().trim() != "") {
+                                        for (var i = st; i <= lt; i++) {
+                                            var chkVal = parseInt(i > 24 ? i - 24 : i);
+
+                                            for (var j = 0; j < shiftidsarray.length; j++) {
+                                                if ($(shiftidsarray[j]).val() > 0) {
+                                                    var arrlist = $(shiftidsarray[j]).attr("title").split('-');
+                                                    var fromint = parseInt(arrlist[0]);
+                                                    var toint = parseInt(arrlist[1]);
+
+                                                    if ((fromint > 12 && fromint > toint) || fromint == 0) {
+                                                        toint += 24;
+
+                                                        if (chkVal <= 12)
+                                                            chkVal += 24;
+                                                    }
+
+                                                    if (chkVal > fromint && chkVal < toint) {
+                                                        $(this).multiselect("widget").find(":checkbox[value='" + $(shiftidsarray[j]).val() + "']").attr({ "checked": false });
+                                                        $(this).multiselect("widget").find(":checkbox[value='" + $(shiftidsarray[j]).val() + "']").attr({ "aria-selected": false });
+                                                        break;
+                                                    }
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                    removeValidation($(this).attr("id"));
+
+                                }
+                            } else {
+                                $("input[id*='ui-multiselect-" + $(this).attr("id") + "'][value='" + ui.value + "']").attr({ "aria-selected": !ui.checked });
+                                if (ui.value == -2 || ui.value == 0) {
+                                    if (ui.checked == true) {
+                                        removeValidation($(this).attr("id"));
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                })
+                    .multiselect("uncheckAll")
+                    .bind("multiselectclick multiselectcheckall multiselectuncheckall", function (event, ui) {
+                        if (ui.value == "0" && $(this).multiselect("widget").find(":checkbox[value='0']").is(":checked") == true) {
+                            $(this).multiselect("uncheckAll");
+                            $(this).multiselect("widget").find(":checkbox[value='0']").attr({ "checked": true });
+                        } else {
+                            $(this).multiselect("widget").find(":checkbox[value='0']").attr({ "checked": false });
+                            removeValidation($(this).attr("id"));
+                        }
+
+                        var shiftsId = $.map($(this).multiselect("getChecked"), function (input) {
+                            return input.value;
+                        });
+                    });
+            }
+
+            function CheckForValidation(cntlval, spn, ctrlid) {
+                if (cntlval == "" || $("#" + ctrlid + " option:selected").text().indexOf("Select") > -1) {
+                    $("#" + spn).show();
+                    var ctrl = $("#" + ctrlid);
+                    if (ctrl.get(0).nodeName == "SELECT") {
+                        if (ctrl.hasClass("select2-hidden-accessible")) {
+                            id = ctrl.attr("id");
+                            // if(ctrl.next().find('select2-container'))
+                            $("#select2-" + id + "-container").parent().addClass('input-required-class')
+                            //$("#select2-" + id + "-container").addClass('input-required-class');
+                            $("#" + id).on("change", function () {
+                                //validateForm(classname);
+                            });
+                        }
+                        else if (ctrl.hasClass("mulitplecombo")) {
+                            ctrl.next().addClass("input-required-class");
+                        }
+                        else {
+                            ctrl.addClass("input-required-class");
+                        }
+                    } else {
+                        ctrl.addClass("input-required-class");
+                    }
+                    //$("#" + ctrlid).addClass("input-required-class");
+                } else {
+                    $("#" + spn).hide();
+                    var ctrl = $("#" + ctrlid);
+                    if (ctrl.get(0).nodeName == "SELECT") {
+                        if (ctrl.hasClass("select2-hidden-accessible")) {
+                            id = ctrl.attr("id");
+                            if ($("#select2-" + id + "-container").parent().hasClass('input-required-class')) {
+                                $("#select2-" + id + "-container").parent().removeClass('input-required-class')
+                                $("#" + id).on("change", function () {
+                                    //validateForm(classname);
+                                });
+                            }
+                        }
+                        else if (ctrl.hasClass("mulitplecombo")) {
+                            if (ctrl.next().hasClass("input-required-class")) {
+                                ctrl.next().removeClass("input-required-class");
+                            }
+                        }
+                        else {
+                            if (ctrl.hasClass("input-required-class")) {
+                                ctrl.removeClass("input-required-class");
+                            }
+                        }
+                    } else {
+                        if (ctrl.hasClass("input-required-class")) {
+                            ctrl.removeClass("input-required-class");
+                        }
+                    }
+                }
+            }
+
+            function onSaveClick() {
+                //checkMonthStatus($('#main_txtEffectiveDateAD').val(), function (result) {
+                    //alert(result);
+                    //if (result === 1) {
+                    //    // Handle the case where the status is true
+                    //    console.log("Status is true");
+                    //} else if (result === 0) {
+                    //    // Handle the case where the status is false
+                    //    console.log("Status is false");
+                    //} else {
+                    //    // Handle errors here if needed
+                    //    console.log("Error occurred");
+                    //}
+                    if (true) {
+                        if (Page_ClientValidate('SaveEmployeewiseDefaultShift')) {
+                            $sundayshift = "";
+                            $Mondayshift = "";
+                            $Tuesdayshift = "";
+                            $WednesdayShift = "";
+                            $ThursdayShift = "";
+                            $FridayShift = "";
+                            $SaturdayShift = "";
+                            $EffectiveDate = "";
+                            $EffectiveTo = "";
+                            $MaxOTOnWorkingDay = "";
+                            $MaxOTOnOffDay = "";
+                            $MaxOTOnPublicHoliday = "";
+                            $Shift = "";
+
+                            var values = new Array();
+
+                            $("#ddlShift1").multiselect("getChecked").each(function (index, item) {
+                                values.push($(item).val());
+                            });
+
+                            $sundayshift = values.join(",");
+                            values = new Array();
+
+                            $("#ddlShift2").multiselect("getChecked").each(function (index, item) {
+                                values.push($(item).val());
+                            });
+
+                            $Mondayshift = values.join(",");
+                            values = new Array();
+                            $("#ddlShift3").multiselect("getChecked").each(function (index, item) {
+                                values.push($(item).val());
+                            });
+
+                            $Tuesdayshift = values.join(",");
+                            values = new Array();
+                            $("#ddlShift4").multiselect("getChecked").each(function (index, item) {
+                                values.push($(item).val());
+                            });
+
+                            $WednesdayShift = values.join(",");
+                            values = new Array();
+                            $("#ddlShift5").multiselect("getChecked").each(function (index, item) {
+                                values.push($(item).val());
+                            });
+
+                            $ThursdayShift = values.join(",");
+                            values = new Array();
+                            $("#ddlShift6").multiselect("getChecked").each(function (index, item) {
+                                values.push($(item).val());
+                            });
+
+                            $FridayShift = values.join(",");
+                            values = new Array();
+                            $("#ddlShift7").multiselect("getChecked").each(function (index, item) {
+                                values.push($(item).val());
+                            });
+
+                            $SaturdayShift = values.join(",");
+                            CheckForValidation($("#<% =ddlEmployeeName.ClientID%>").val(), 'spnEmployeeName', "<% =ddlEmployeeName.ClientID%>");
+                            //CheckForValidation($("#<% =txtEmpId.ClientID%>").val(), 'spnEmployeeId',"<% =txtEmpId.ClientID%>");
+                            CheckForValidation($sundayshift, 'spnShift1', "ddlShift1");
+                            CheckForValidation($Mondayshift, 'spnShift2', "ddlShift2");
+                            CheckForValidation($Tuesdayshift, 'spnShift3', "ddlShift3");
+                            CheckForValidation($WednesdayShift, 'spnShift4', "ddlShift4");
+                            CheckForValidation($ThursdayShift, 'spnShift5', "ddlShift5");
+                            CheckForValidation($FridayShift, 'spnShift6', "ddlShift6");
+                            CheckForValidation($SaturdayShift, 'spnShift7', "ddlShift7");
+
+                            CheckForValidation($("#<% =txtEffectiveDateAD.ClientID%>").val(), 'spnEffectiveDate', "<% =txtEffectiveDateAD.ClientID%>");
+                            $EffectiveDate = $("#<% =txtEffectiveDateAD.ClientID%>").val();
+                            CheckForValidation($("#<% =txtEffectiveDateBS.ClientID%>").val(), 'spnEffectiveDate', "<% =txtEffectiveDateBS.ClientID%>");
+                            //$EffectiveDate = $("#<% =txtEffectiveDateBS.ClientID%>").val();
+                            $EffectiveTo = $("#<%=txtEffectiveToDateAD.ClientID%>").val();
+                            $MaxOTOnWorkingDay = $("#<%=txtMaxOTOnWorkingDay.ClientID%>").val();
+                            $MaxOTOnOffDay = $("#<%=txtMaxOTOnOffDay.ClientID%>").val();
+                            $MaxOTOnPublicHoliday = $("#<%=txtMaxOTOnPublicHoliday.ClientID%>").val();
+                            $Shift = $("#<%=ddlShift.ClientID%>").val();
+
+                            // Check for empty or null values for MaxOTOnWorkingDay, MaxOTOnOffDay, and MaxOTOnPublicHoliday
+                            if ($MaxOTOnWorkingDay == "" || $MaxOTOnWorkingDay == null) {
+                                $MaxOTOnWorkingDay = "0"; // Set a default value or handle as needed
+                            }
+                            if ($MaxOTOnOffDay == "" || $MaxOTOnOffDay == null) {
+                                $MaxOTOnOffDay = "0"; // Set a default value or handle as needed
+                            }
+                            if ($MaxOTOnPublicHoliday == "" || $MaxOTOnPublicHoliday == null) {
+                                $MaxOTOnPublicHoliday = "0"; // Set a default value or handle as needed
+                            }
+
+                            if ($("#<% =ddlEmployeeName.ClientID%>").val() != 0 && $sundayshift != "" && $Mondayshift != "" && $Tuesdayshift != "" && $WednesdayShift != "" && $ThursdayShift != "" && $FridayShift != "" && $SaturdayShift != "" && $EffectiveDate != "") {
+                                PageMethods.SaveEmployeewiseDefaultShift($("#<%= hdnRecordId.ClientID%>").val(), $("#<% =ddlEmployeeName.ClientID%>").val(),
+                                    $sundayshift,
+                                    $Mondayshift,
+                                    $Tuesdayshift,
+                                    $WednesdayShift,
+                                    $ThursdayShift,
+                                    $FridayShift,
+                                    $SaturdayShift,
+                                    $EffectiveDate,
+                                    $EffectiveTo,
+                                    $MaxOTOnWorkingDay,
+                                    $MaxOTOnOffDay,
+                                    $MaxOTOnPublicHoliday,                 $Shift,
+                                    function (response) {
+                                        var msgarray = response.split("#@#");
+                                        console.log(msgarray);
+                                        if (msgarray[0].includes("exists")) {
+                                            csscody.error(msgarray[1]);
+                                        } else {
+                                            $("#tabledisplay").dataTable().fnDestroy();
+                                            BindGrid();
+                                            editedtr = "0";
+                                            //showBlankDiv();
+                                            $("#<% =ddlEmployeeName.ClientID%>").val('');
+                                            $("#<% =ddlEmployeeName.ClientID%>").select2();
+                                            if ($("#<%= hdnRecordId.ClientID%>").val() != "0")
+                                                closePopup();
+                                            clearfields();
+                                            ShowNotification(msgarray[0]);
+                                        }
+                                    });
+                            }
+                        }
+                    }
+                    else {
+                        csscody.error(result);
+                    }
+                //});
+                //alert(checkMonthStatus($('#main_txtEffectiveDateAD').val()));
+                <%--if (Page_ClientValidate('SaveEmployeewiseDefaultShift')) {
+                    $sundayshift = "";
+                    $Mondayshift = "";
+                    $Tuesdayshift = "";
+                    $WednesdayShift = "";
+                    $ThursdayShift = "";
+                    $FridayShift = "";
+                    $SaturdayShift = "";
+                    $EffectiveDate = "";
+
+                    var values = new Array();
+
+                    $("#ddlShift1").multiselect("getChecked").each(function (index, item) {
+                        values.push($(item).val());
+                    });
+
+                    $sundayshift = values.join(",");
+                    values = new Array();
+
+                    $("#ddlShift2").multiselect("getChecked").each(function (index, item) {
+                        values.push($(item).val());
+                    });
+
+                    $Mondayshift = values.join(",");
+                    values = new Array();
+                    $("#ddlShift3").multiselect("getChecked").each(function (index, item) {
+                        values.push($(item).val());
+                    });
+
+                    $Tuesdayshift = values.join(",");
+                    values = new Array();
+                    $("#ddlShift4").multiselect("getChecked").each(function (index, item) {
+                        values.push($(item).val());
+                    });
+
+                    $WednesdayShift = values.join(",");
+                    values = new Array();
+                    $("#ddlShift5").multiselect("getChecked").each(function (index, item) {
+                        values.push($(item).val());
+                    });
+
+                    $ThursdayShift = values.join(",");
+                    values = new Array();
+                    $("#ddlShift6").multiselect("getChecked").each(function (index, item) {
+                        values.push($(item).val());
+                    });
+
+                    $FridayShift = values.join(",");
+                    values = new Array();
+                    $("#ddlShift7").multiselect("getChecked").each(function (index, item) {
+                        values.push($(item).val());
+                    });
+
+                    $SaturdayShift = values.join(",");
+                    CheckForValidation($("#<% =ddlEmployeeName.ClientID%>").val(), 'spnEmployeeName',"<% =ddlEmployeeName.ClientID%>");
+                //CheckForValidation($("#<% =txtEmpId.ClientID%>").val(), 'spnEmployeeId',"<% =txtEmpId.ClientID%>");
+                    CheckForValidation($sundayshift, 'spnShift1', "ddlShift1");
+                    CheckForValidation($Mondayshift, 'spnShift2', "ddlShift2");
+                    CheckForValidation($Tuesdayshift, 'spnShift3', "ddlShift3");
+                    CheckForValidation($WednesdayShift, 'spnShift4', "ddlShift4");
+                    CheckForValidation($ThursdayShift, 'spnShift5', "ddlShift5");
+                    CheckForValidation($FridayShift, 'spnShift6', "ddlShift6");
+                    CheckForValidation($SaturdayShift, 'spnShift7', "ddlShift7");
+
+                    CheckForValidation($("#<% =txtEffectiveDateAD.ClientID%>").val(), 'spnEffectiveDate',"<% =txtEffectiveDateAD.ClientID%>");
+                    $EffectiveDate = $("#<% =txtEffectiveDateAD.ClientID%>").val();
+                    CheckForValidation($("#<% =txtEffectiveDateBS.ClientID%>").val(), 'spnEffectiveDate',"<% =txtEffectiveDateBS.ClientID%>");
+                    //$EffectiveDate = $("#<% =txtEffectiveDateBS.ClientID%>").val();
+
+                    if ($("#<% =ddlEmployeeName.ClientID%>").val() != 0 && $sundayshift != "" && $Mondayshift != "" && $Tuesdayshift != "" && $WednesdayShift != "" && $ThursdayShift != "" && $FridayShift != "" && $SaturdayShift != "" && $EffectiveDate != "") {
+                        PageMethods.SaveEmployeewiseDefaultShift($("#<%= hdnRecordId.ClientID%>").val(), $("#<% =ddlEmployeeName.ClientID%>").val(),
+                            $sundayshift,
+                            $Mondayshift,
+                            $Tuesdayshift,
+                            $WednesdayShift,
+                            $ThursdayShift,
+                            $FridayShift,
+                            $SaturdayShift,
+                            $EffectiveDate,
+                            function (response) {
+                                var msgarray = response.split("#@#");
+                                $("#tabledisplay").dataTable().fnDestroy();
+                                BindGrid();
+                                editedtr = "0";
+                                showBlankDiv();
+                                $("#<% =ddlEmployeeName.ClientID%>").val('');
+                                $("#<% =ddlEmployeeName.ClientID%>").select2();
+                                if ($("#<%= hdnRecordId.ClientID%>").val() != "0")
+                                    closePopup();
+                                clearfields();
+                                ShowNotification(msgarray[0]);
+
+                            });
+                    }
+                }--%>
+                return false;
+            }
+
+            function onEmployeeChange(ddlcontrol, txtcontrol) {
+                $("#" + txtcontrol).val($("#" + ddlcontrol).val());
+                if ($("#" + ddlcontrol).val() == "0") {
+                    $("#" + txtcontrol).val('<%=Resources.Language.ID %>');
+                }
+                $("#main_ddlShift").empty();
+                $("#remunerationLabel").text("");
+                $("#<%=txtMaxOTOnWorkingDay.ClientID%>").val("");
+                $("#<%=txtMaxOTOnOffDay.ClientID%>").val("");
+                $("#<%=txtMaxOTOnPublicHoliday.ClientID%>").val("");
+                $("#<%=txtMaxOTOnWorkingDay.ClientID%>").removeAttr('min').removeAttr('max');
+
+                //console.log({ globalMode, globalShiftid})
+                if (globalMode == 'add' || globalMode == 'edit' || globalMode == true || globalMode == false) {
+                    PageMethods.GetRemunerationBasedOnEmp($("#<% =ddlEmployeeName.ClientID%>").val(), function (response) {
+                        //console.log(response);
+                        //{"remuneration":[{"emp_id":11835,"RemunerationID":2,"RemunerationCode":"ABC","RemunerationName":"Remuneration Test","DutyDayMaxOT":"120","OffDayMaxOT":"180"}]}
+                        var data = JSON.parse(response);
+                        if (data.remuneration.length > 0) {
+                            $("#remunerationLabel").text("Remuneration: " + data.remuneration[0].RemunerationName + " (" + data.remuneration[0].RemunerationCode + ")");
+                            
+                            if ((globalMode == 'add' || globalMode == false) && globalShiftid == null) {
+                                <%--$("#<%=txtMaxOTOnWorkingDay.ClientID%>").val(data.remuneration[0].DutyDayMaxOT);--%>
+                                $("#<%=txtMaxOTOnOffDay.ClientID%>").val(data.remuneration[0].OffDayMaxOT);
+                                $("#<%=txtMaxOTOnPublicHoliday.ClientID%>").val(data.remuneration[0].OffDayMaxOT);
+                            }
+                        }
+                    })
+                }
+
+                PageMethods.GetShiftBasedOnOffice($("#<% =ddlEmployeeName.ClientID%>").val(), function (response) {
+                    //console.log(response);
+                    //response output
+                    //{"shifts":[{"WORK_ID":1,"ShiftName":"DS_summer"},{"WORK_ID":4,"ShiftName":"OT3_Shift_Summer"}]}
+                    var data = JSON.parse(response);
+
+                    $("#main_ddlShift").append($('<option>', {
+                        value: 0,
+                        text: 'Select'
+                    }));
+                    $.each(data.shifts, function (index, item) {
+                        $("#main_ddlShift").append($('<option>', {
+                            value: item.WORK_ID,
+                            text: item.ShiftName
+                        }));
+                    });
+
+                    if (globalMode = 'edit' && globalShiftid != null) {
+                        $("#main_ddlShift").val(globalShiftid);
+                        $("#main_ddlShift").select2().trigger('change');
+                    } else {
+                        $("#main_ddlShift").select2();
+                    }
+                })
+            }
+            /*
+            function showBlankDiv() {
+                // setTimeout( function() {
+                if ($('.dataTables_empty').length > 0) {
+                    $("#tbldisplaywrapper").hide();
+                    $("#emptyWrapper").show();
+                } else {
+                    $("#tbldisplaywrapper").show();
+                    $("#emptyWrapper").hide();
+                }
+                //  }, 300);
+            }
+            */
+            function tabForShift() {
+                $(".PSTab").removeClass("current");
+                $("#tabForShift").addClass("current");
+                // Show the content div for Insurance Basic tab and hide the other
+                document.getElementById("divHeaderContentShift").style.display = "block";
+                document.getElementById("divHeaderContentDays").style.display = "none";
+                document.getElementById("divHeaderContentOTSetting").style.display = "none";
+            }
+            function tabForDays() {
+                $(".PSTab").removeClass("current");
+                $("#tabForDays").addClass("current");
+                // Show the content div for Insurance Basic tab and hide the other
+                document.getElementById("divHeaderContentShift").style.display = "none";
+                document.getElementById("divHeaderContentDays").style.display = "block";
+                document.getElementById("divHeaderContentOTSetting").style.display = "none";
+            }
+            function tabForOTSetting() {
+                $(".PSTab").removeClass("current");
+                $("#tabForOTSetting").addClass("current");
+                // Show the content div for Insurance Basic tab and hide the other
+                document.getElementById("divHeaderContentShift").style.display = "none";
+                document.getElementById("divHeaderContentDays").style.display = "none";
+                document.getElementById("divHeaderContentOTSetting").style.display = "block";
+            }
+            function ShowShiftList(id) {
+                obj = $("#" + id);
+                if ($(obj).parent().hasClass('current'))
+                    return false;
+                $(".tabheaderlist ul.tabs li").removeClass("current");
+                $(obj).parent().addClass("current");
+                $(".dashboard-list").hide();
+                $(".dashboard-list." + $(obj).data("container")).show();
+                $(".action-wrapper .fullwidth.fleft.button-control-wrapper").hide();
+
+                $(".action-wrapper #" + $(obj).data("button")).show();
+            }
+            function ShiftTab() {
+                var currentDomain = window.location.protocol + "//" + window.location.host;
+                window.location.href = currentDomain + "/ShiftSetup.aspx";
+            }
+            function DefaultShiftTab() {
+                var currentDomain = window.location.protocol + "//" + window.location.host;
+                var url = currentDomain + "/ShiftSetup.aspx";
+
+                // Append parameter to the URL
+                url += "?showShiftList=true";
+
+                // Redirect to the updated URL
+                window.location.href = url;
+            }
+            function DutyRosterTab() {
+                var currentDomain = window.location.protocol + "//" + window.location.host;
+                window.location.href = currentDomain + "/DutyRoster.aspx";
+            }
+            function DeputationTab() {
+                var currentDomain = window.location.protocol + "//" + window.location.host;
+                window.location.href = currentDomain + "/Deputation.aspx";
+            }
+        </script>
+
+        <script id="AddShiftTemplate" type="text/x-jQuery-tmpl">
+            <tr class='RowStyle no-color'>
+                <td class="padTop8 w-110">
+                    <span id='lblDayName${rowindex}'>Day${rowindex}</span>
+                </td>
+                <td class="por">
+                    <div style='display: block; overflow: hidden;'>
+                        {{if ShiftList}} 
+                        <select id='ddlShift${rowindex}' class='mulitplecombo multicombo w-200'>
+                            {{each ShiftList}}
+                             {{if $value.status == "False"}}
+                                <option data-disabled="true" value="${$value.value}">${$value.key}</option>
+                            {{else}}
+                                <option data-disabled="false" value="${$value.value}">${$value.key}</option>
+                            {{/if}}
+                            {{/each}}
+                        </select>
+                        {{/if}}
+                        <div class='poa'>
+                            <span class='text-red' id='spnShift${rowindex}' style='display: none;'>*</span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </script>
+
+        <asp:ScriptManagerProxy ID="detail" runat="server">
+            <Scripts>
+                <asp:ScriptReference Path="~/js/JScript.js" />
+            </Scripts>
+        </asp:ScriptManagerProxy>
+
+        <div class="pagetitle__wrapper">
+            <div class="pagetitle-div">
+                <div class="page-title-icon">
+                    <i class="fa fa-database" aria-hidden="true"></i>
+                </div>
+                <h1 class="pagetitle hidden" >                   
+                    <asp:Label ID="lblEmployeeDetails" runat="server"></asp:Label>
+                    <div class="page-short-desc">
+                        <div class="labelled fullwidth">
+                            <p>
+                                <span><%= Resources.PageTitle.PersonwiseDefaultShiftDescription%></span>
+                            </p>
+                        </div>
+                    </div>
+                </h1>
+                <%--<div id="PersonalDetailInformation" class="fullwidth fleft por">
+                    <input type="button" id="btnAdd" class="btn btn-green" runat="server" onclick="AddClick(); return false;" value="<%$ Resources:Language, AddShift %>" />
+                </div>--%>
+            </div>
+
+            <div class="action-wrapper change-pos">
+                <%--<div id="PersonalDetailInformation" class="fullwidth fleft por">
+                    <input type="button" id="btnAdd" class="btn btn-green" runat="server" onclick="AddClick(); return false;" value="<%$ Resources:Language, AddShift %>" />
+                </div>--%>
+                <div id="div_exports" class="export-preview padded-left DisplayBlock" runat="server">
+                    <div class="d-inline-block dropdown dropdown-inner">
+                        <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="btn-shadow dropdown-toggle btn btn-info">
+                            <span class="btn-icon-wrapper">
+                                <svg class="tipped-hide ma" width="3" height="13" viewBox="0 0 3 13" xmlns="http://www.w3.org/2000/svg"
+                                    data-bind="" data-tipped="Options">
+                                    <path data-bind=""
+                                        fill="#fff" d="M0 1.5C0 .6716.6716 0 1.5 0S3 .6716 3 1.5 2.3284 3 1.5 3 0 2.3284 0 1.5zm0 5C0 5.6716.6716 5 1.5 5S3 5.6716 3 6.5 2.3284 8 1.5 8 0 7.3284 0 6.5zm0 5c0-.8284.6716-1.5 1.5-1.5s1.5.6716 1.5 1.5S2.3284 13 1.5 13 0 12.3284 0 11.5z">
+                                    </path>
+                                </svg>
+                            </span>
+                        </button>
+                        <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right">
+                            <ul class="nav flex-column">
+
+                                <li class="nav-item">
+                                    <a href="javascript:void(0);" id="lnkExport" onclick="lnkExport()" title="Export" data-id="" class="action-icon nav-link">
+                                        <i class="fa fa-file-excel-o"></i><%= Resources.Language.ExportToExcel %></a>
+                                    <%--<asp:Button ID="lnkExportBtn" runat="server" Visible="false" Text="<%$ Resources:Language, ExportToExcel %>" OnClick="lnkExport_Click" CssClass="buttonStyle btn btn-green" />--%>
+
+
+                                    <img id="imgloadingExportI" class="loginloading" src="images/loginloading.gif" alt=".." />
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="add-details">
+            <div class="tabbed-pane tabheaderlist mar-bottom-10 mt-0" style="clear: both; overflow: hidden;">
+                <ul class="tabs">
+                    <li id="ShiftTab" runat="server">
+                        <a href="javascript:void(0);" id="aShiftTab" data-container="shiftPanel" data-button="ShiftAdd" onclick="ShiftTab();return false;">
+                            <div class="pagetitle">
+                                <asp:Label ID="Label5" runat="server" Text="<%$ Resources:Language, Shift %>"></asp:Label>
+                            </div>
+                        </a>
+                    </li>
+                    <li id="DefaultShiftTab" runat="server">
+                        <a href="javascript:void(0);" id="aDefaultShiftTab" data-container="defaultShiftPanel" data-button="DefaultShiftAdd" onclick="DefaultShiftTab(); return false;">
+                            <div class="pagetitle">
+                                <asp:Label ID="Label17" runat="server" Text="<%$ Resources:Language, DefaultShift %>"></asp:Label>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="current" id="PersonwiseDefaultShiftTab" runat="server">
+                        <a href="javascript:void(0);" id="aPersonwiseDefaultShiftTab" data-container="personwiseDefaultShiftPanel" data-button="PersonwiseDefaultShiftAdd" onclick="ShowShiftList('aPersonwiseDefaultShiftTab'); return false;">
+                            <div class="pagetitle">
+                                <asp:Label ID="lblPersonwise" runat="server" Text="Personwise Shift"></asp:Label>
+                            </div>
+                        </a>
+                    </li>
+                    <li id="DutyRosterTab" runat="server">
+                        <a href="javascript:void(0);" id="aDutyRosterTab" data-container="dutyRosterPanel" data-button="DutyRosterAdd" onclick="DutyRosterTab(); return false;">
+                            <div class="pagetitle">
+                                <asp:Label ID="lblDutyRoster" runat="server" Text="Duty Roster"></asp:Label>
+                            </div>
+                        </a>
+                    </li>
+                    <li id="DeputationTab" runat="server">
+                        <a href="javascript:void(0);" id="aDeputationTab" data-container="deputationPanel" data-button="DeputationAdd" onclick="DeputationTab(); return false;">
+                            <div class="pagetitle">
+                                <asp:Label ID="lblDeputation" runat="server" Text="Deputation"></asp:Label>
+                            </div>
+                        </a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <div class="tabbed-pane">
+            <%--<div class="wrap-table GridView-withhover">--%>
+            <div class="wrap-table overflow-visible personwise_default_shift_tbl_wrapper">
+
+                <div id="PersonalDetailInformation" class="fleft por">
+                    <input type="button" id="btnAdd" class="btn btn-green" runat="server" onclick="AddClick(); return false;" value="<%$ Resources:Language, AddShift %>" />
+                </div>
+
+                <div id="tbldisplaywrapper" class="por fullwidth fleft">
+                    <asp:Literal ID="tbldisplay" runat="server"></asp:Literal>
+                </div>
+            </div>
+        </div>
+
+        <div class="popped-up modal" id="dialog-form-EmployeewiseDefaultShift" id="pnlPerswiseDefaultShift" style="display: none;">
+            <div class="modal-dialog modal-normal">
+                <div class="modal-header">
+                    <asp:Label ID="lblEventHeader" runat="server" Text="<%$ Resources:Language, New %>"></asp:Label>
+                    <img src="StyleSheet/images/close.svg" class="close-image-button" alt="close" onclick="closePopup();" />
+                </div>
+                <div class="modal-body">
+                    <table border="0" class="neutal fullwidth">
+                        <tr>
+                            <td class="padTop8 w-110">
+                                <asp:Label ID="lblemployeeName" runat="server" Text="<%$ Resources:Language, Person %>"></asp:Label>
+                            </td>
+                            <td>
+                                <div class="dropdown-with-text dropdown-with-validation">
+                                    <asp:HiddenField ID="hdnRecordId" runat="server" />
+                                    <asp:DropDownList ID="ddlEmployeeName" runat="server"></asp:DropDownList>
+                                    <asp:TextBox ID="txtEmpId" runat="server" Width="35px"></asp:TextBox>
+                                    <div class='poa'>
+                                        <span id="spnEmployeeName" style="color: Red; display: none;">*</span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr style="height:30px;">
+                            <td></td>
+                            <td  id="remunerationLabel"></td>
+                        </tr>
+                        </table>
+                
+                    <ul class="tabs" style="margin-bottom:15px !important;">
+                        <li id="tabForShift" class="current PSTab" data-cotainer="divHeaderContentShift">
+                            <a href="javascript:void(0);" onclick="tabForShift();">
+                                <div class="pagetitle">
+                                    <asp:Label ID="lblShift" runat="server" Text="<%$ Resources:Language, Shift %>"></asp:Label>
+                                </div>
+                            </a>
+                        </li>
+                        <li id="tabForDays" class="PSTab" data-container="divHeaderContentDays">
+                            <a href="javascript:void(0);" onclick="tabForDays();">
+                                <div class="pagetitle">
+                                    <asp:Label ID="lblDays" runat="server" Text="<%$ Resources:Language, Days %>"></asp:Label>
+                                </div>
+                            </a>
+                        </li>
+                        <li id="tabForOTSetting" class="PSTab" data-container="divHeaderContentOTSetting">
+                            <a href="javascript:void(0);" onclick="tabForOTSetting();">
+                                <div class="pagetitle">
+                                    <asp:Label id="lblOTSetting" runat="server" Text="OT Settings"></asp:Label>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                
+                    <div id="divHeaderContentShift" class="tablewrapper PSBody" style="display:block;">
+                    <table border="0" class="neutal fullwidth">
+                        <tr>
+                            <td class="padTop8 w-110">
+                                <asp:Label ID="lblShiftName" runat="server" Text="<%$ Resources:Language, Shift %>"></asp:Label>
+                            </td>
+                            <td class="por">
+                                <asp:DropDownList ID="ddlShift" runat="server" CssClass="fullwidth"></asp:DropDownList>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="padTop8 w-110">
+                                <span>
+                                    Effective From
+                                </span>
+                            </td>
+                            <td>
+                                <% string display = "";
+                                    if (Convert.ToBoolean(Session["ShowBSDate"]) != true)
+                                    { display = "display:none;"; }
+                                %>
+                                <div class="dflex">
+                                    <div class="por" style="<%= display%>">
+                                        <asp:TextBox ID="txtEffectiveDateBS" runat="server" PlaceHolder="YYYY/MM/DD" CssClass="inputTextBox125 nsdatepicker"></asp:TextBox>
+                                        <span id="spnEffectiveDate" style="color: Red; display: none;">*</span>
+                                    </div>
+                                    <div class="por w-250 hidden">
+                                        <asp:TextBox ID="txtEffectiveDateAD" runat="server" CssClass="inputTextBox125 datepicker"></asp:TextBox>
+                                        <ajaxToolkit:CalendarExtender ID="CE_txtEffectiveDateAD" runat="server" Enabled="True" OnClientShown="changeTodayText" TargetControlID="txtEffectiveDateAD"></ajaxToolkit:CalendarExtender>
+                                        <div class="text-red">
+                                            <asp:RegularExpressionValidator ID="REVEffectiveDate" runat="server" ControlToValidate="txtEffectiveDateAD" ValidationGroup="SaveEmployeewiseDefaultShift" Display="Dynamic" ErrorMessage="* MM/DD/YYYY" ValidationExpression="(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[012])[- /.](19|20)\d\d"></asp:RegularExpressionValidator>
+                                            <ajaxToolkit:FilteredTextBoxExtender ID="FTBtxtEffectiveDateAD" runat="server" Enabled="True" TargetControlID="txtEffectiveDateAD" FilterType="Custom" ValidChars="0123456789/.-"></ajaxToolkit:FilteredTextBoxExtender>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="padTop8 w-110">
+                                <span>
+                                    Effective To
+                                </span>
+                            </td>
+                            <td>
+                                <% string display1 = "";
+                                    if (Convert.ToBoolean(Session["ShowBSDate"]) != true)
+                                    { display = "display:none;"; }
+                                %>
+                                <div class="dflex">
+                                    <div class="por" style="<%= display%>">
+                                        <asp:TextBox ID="txtEffectiveToDateBS" runat="server" PlaceHolder="YYYY/MM/DD" CssClass="inputTextBox125 nsdatepicker"></asp:TextBox>
+                                    </div>
+                                    <div class="por w-250 hidden">
+                                        <asp:TextBox ID="txtEffectiveToDateAD" runat="server" CssClass="inputTextBox125 datepicker"></asp:TextBox>
+                                        <ajaxToolkit:CalendarExtender ID="CE_txtEffectiveToDateAD" runat="server" Enabled="True" OnClientShown="changeTodayText" TargetControlID="txtEffectiveToDateAD"></ajaxToolkit:CalendarExtender>
+                                        <%--<div class="text-red">
+                                            <asp:RegularExpressionValidator ID="REVEffectiveToDate" runat="server" ControlToValidate="txtEffectiveToDateAD" ValidationGroup="SaveEmployeewiseDefaultShift" Display="Dynamic" ErrorMessage="* MM/DD/YYYY" ValidationExpression="(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[012])[- /.](19|20)\d\d"></asp:RegularExpressionValidator>
+                                            <ajaxToolkit:FilteredTextBoxExtender ID="FTBtxtEffectiveToDateAD" runat="server" Enabled="True" TargetControlID="txtEffectiveToDateAD" FilterType="Custom" ValidChars="0123456789/.-"></ajaxToolkit:FilteredTextBoxExtender>
+                                        </div>--%>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                    </div>
+                    <div id="divHeaderContentDays" class="tablewrapper PSBody" style="display:none;">
+                    <table id="DefaultShiftContainer" border="0" class="neutal fullwidth">
+                    </table>
+                    </div>
+                    <div id="divHeaderContentOTSetting" class="tablewrapper PSBody" style="display: none;">
+                        <table border="0" class="neutal fullwidth">
+                            <tr>
+                                <td>
+                                    <div class="dflex flex-column">
+                                        <div class="label-wrapper dflex">
+                                            <strong>
+                                                <asp:Label ID="lblMaxOTOnWorkingDay" runat="server" Text="Max OT On Working Day(Hr)"></asp:Label>
+                                            </strong>
+                                        </div>
+
+                                        <div class="input-wrapper dflex align-items-center flex-column por">
+                                            <asp:TextBox ID="txtMaxOTOnWorkingDay" runat="server" CssClass="" TabIndex="1"></asp:TextBox>
+                                            <span class="text-red validation-div">
+                                                <%--<asp:RangeValidator ID="RangeValidator7" runat="server" ControlToValidate="txtWorkHr" MaximumValue="72" MinimumValue="<%# (0.5).ToString(System.Globalization.CultureInfo.CurrentCulture) %>" ErrorMessage="should not be greater than 24 and less that .5" Type="Double" Display="Dynamic" ValidationGroup="applyHoliday" />--%>
+                                                <ajaxToolkit:FilteredTextBoxExtender ID="FilteredTextBoxExtender18" runat="server" FilterType="Custom" ValidChars="0123456789." TargetControlID="txtMaxOTOnWorkingDay" Enabled="true"></ajaxToolkit:FilteredTextBoxExtender>
+                                                <%--<div class="poa">
+                    <asp:RequiredFieldValidator ID="RequiredFieldValidator7" Display="Dynamic" runat="server" ErrorMessage="RequiredFieldValidator" ControlToValidate="txtBeforeShiftMinimumMinuteForOT" ValidationGroup="applyHoliday" Text="*"></asp:RequiredFieldValidator>
+                </div>--%>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="dflex flex-column">
+                                        <div class="label-wrapper dflex">
+                                            <strong>
+                                                <asp:Label ID="lblMaxOTOnOffDay" runat="server" Text="Max OT On Off Day(Hr)"></asp:Label>
+                                            </strong>
+                                        </div>
+
+                                        <div class="input-wrapper dflex align-items-center flex-column por">
+                                            <asp:TextBox ID="txtMaxOTOnOffDay" runat="server" CssClass="" TabIndex="1"></asp:TextBox>
+                                            <span class="text-red validation-div">
+                                                <%--<asp:RangeValidator ID="RangeValidator7" runat="server" ControlToValidate="txtWorkHr" MaximumValue="72" MinimumValue="<%# (0.5).ToString(System.Globalization.CultureInfo.CurrentCulture) %>" ErrorMessage="should not be greater than 24 and less that .5" Type="Double" Display="Dynamic" ValidationGroup="applyHoliday" />--%>
+                                                <ajaxToolkit:FilteredTextBoxExtender ID="FilteredTextBoxExtender1" runat="server" FilterType="Custom" ValidChars="0123456789." TargetControlID="txtMaxOTOnOffDay" Enabled="true"></ajaxToolkit:FilteredTextBoxExtender>
+                                                <%--<div class="poa">
+    <asp:RequiredFieldValidator ID="RequiredFieldValidator7" Display="Dynamic" runat="server" ErrorMessage="RequiredFieldValidator" ControlToValidate="txtBeforeShiftMinimumMinuteForOT" ValidationGroup="applyHoliday" Text="*"></asp:RequiredFieldValidator>
+</div>--%>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="dflex flex-column">
+                                        <div class="label-wrapper dflex">
+                                            <strong>
+                                                <asp:Label ID="lblMaxOTOnPublicHoliday" runat="server" Text="Max OT On Public Holiday(Hr)"></asp:Label>
+                                            </strong>
+                                        </div>
+
+                                        <div class="input-wrapper dflex align-items-center flex-column por">
+                                            <asp:TextBox ID="txtMaxOTOnPublicHoliday" runat="server" CssClass="" TabIndex="1"></asp:TextBox>
+                                            <span class="text-red validation-div">
+                                                <%--<asp:RangeValidator ID="RangeValidator7" runat="server" ControlToValidate="txtWorkHr" MaximumValue="72" MinimumValue="<%# (0.5).ToString(System.Globalization.CultureInfo.CurrentCulture) %>" ErrorMessage="should not be greater than 24 and less that .5" Type="Double" Display="Dynamic" ValidationGroup="applyHoliday" />--%>
+                                                <ajaxToolkit:FilteredTextBoxExtender ID="FilteredTextBoxExtender2" runat="server" FilterType="Custom" ValidChars="0123456789." TargetControlID="txtMaxOTOnPublicHoliday" Enabled="true"></ajaxToolkit:FilteredTextBoxExtender>
+                                                <%--<div class="poa">
+    <asp:RequiredFieldValidator ID="RequiredFieldValidator7" Display="Dynamic" runat="server" ErrorMessage="RequiredFieldValidator" ControlToValidate="txtBeforeShiftMinimumMinuteForOT" ValidationGroup="applyHoliday" Text="*"></asp:RequiredFieldValidator>
+</div>--%>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="button-control-wrapper dflex justify-content-between fullwidth">
+                        <a href="javascript:void(0)" class="btn btn-default" onclick="closePopup();"><%=Resources.Language.Cancel %></a>
+                        <asp:Button ID="btnSave" runat="server" class="btn btn-green" Text="<%$ Resources:Language,Save %>" OnClientClick="return onSaveClick();" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="divEditPersonalwiseShift" runat="server">
+        </div>
+    </div>
+</asp:Content>

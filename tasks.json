@@ -1,0 +1,45 @@
+{
+  "status": 200,
+  "data": [
+    {
+      "id": 1230,
+      "title": "test",
+      "description": "test desc",
+      "start_date": null,
+      "end_date": null,
+      "status": {
+        "title": "Ongoing",
+        "bg_color": "bg-warning"
+      },
+      "priority": {
+        "title": null,
+        "bg_color": "bg-danger"
+      },
+      "client_details": {
+        "name": "test name",
+        "email": "test@test.com",
+        "phone": "9898989898"
+      }
+    },
+    {
+      "id": 1232,
+      "title": "test",
+      "description": "test desc",
+      "start_date": null,
+      "end_date": null,
+      "status": {
+        "title": "Pending",
+        "bg_color": "bg-danger"
+      },
+      "priority": {
+        "title": "Pending",
+        "bg_color": "bg-danger"
+      },
+      "client_details": {
+        "name": "test name",
+        "email": "test@test.com",
+        "phone": "9898989898"
+      }
+    }
+  ]
+}

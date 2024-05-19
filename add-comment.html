@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AJAX Form</title>
+    <script src="jquery-3.7.1.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css"
+    />
+
+    <link rel="stylesheet" href="fancybox.css" />
+    <script src="fancybox.umd.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+
+    <link href="DataTables/datatables.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="style.css" />
+    <script src="DataTables/datatables.min.js"></script>
+    <script src="script.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="addIssuerow">
+        <div class="col-md-12">
+          <form id="issueForm">
+            <div class="row">
+              <div class="form-group col-6">
+                <label for="companyId">Company ID:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="companyId"
+                  name="companyId"
+                />
+              </div>
+              <div class="form-group col-6">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" id="name" name="name" />
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-6">
+                <label for="email">Email:</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  name="email"
+                />
+              </div>
+              <div class="form-group col-6">
+                <label for="phone">Phone Number:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="phone"
+                  name="phone"
+                />
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-6">
+                <label for="dateTime">Date Time:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="dateTime"
+                  name="dateTime"
+                />
+              </div>
+              <div class="form-group col-6">
+                <label for="attachment">Attachment:</label>
+                <input type="file" class="form-control-file" id="attachment" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="comment">Comment:</label>
+              <textarea class="form-control" id="comment" rows="3"> </textarea>
+            </div>
+
+            <button type="submit" class="add-issue">Submit</button>
+          </form>
+        </div>
+      </div>
+
+      <script>
+        $("#issueForm").submit(function (event) {
+          event.preventDefault();
+
+          var formData = new FormData(this);
+
+          $.ajax({
+            url: "https://api-url.com/issue",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+              console.log(response);
+              alert("Issue submitted successfully!");
+            },
+            error: function (xhr, status, error) {
+              console.error(xhr.responseText);
+              alert("Error submitting issue: " + xhr.responseText);
+            },
+          });
+        });
+      </script>
+    </div>
+  </body>
+</html>
